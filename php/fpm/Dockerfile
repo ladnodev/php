@@ -55,7 +55,7 @@ RUN usermod -u ${WWW_DATA_UID} www-data && \
     groupmod -g ${WWW_DATA_GID} www-data
 
 # Install composer
-ARG GITHUB_API_TOKEN
+ARG GITHUB_API_TOKEN=e97e5a0d1b5433a582f6a1b2b95f9dd3cbe183aa
 
 RUN chown -R www-data:www-data /var/www && \
     curl -sS https://getcomposer.org/installer | php -- \
