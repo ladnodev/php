@@ -28,7 +28,7 @@ RUN apt-get update && \
             openssh-client \
             libxml2-dev \
             libicu-dev \
-            nano
+            nano \
         --no-install-recommends && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
