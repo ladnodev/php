@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-sudo -u www-data composer "$@"
+arg=$*
+su - www-data -s /bin/bash -c "cd /app && composer ${arg}"

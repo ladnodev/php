@@ -7,7 +7,7 @@ WORKDIR /root
 # Install system packages for PHP extensions
 RUN apt-get update && \
     apt-get -y install \
-            sudo \
+            git \
             g++ \
             libmcrypt-dev \
             libfreetype6-dev \
@@ -18,11 +18,19 @@ RUN apt-get update && \
             mysql-client \
             openssh-client \
             libxml2-dev \
-            nano \
-            wget \
+            libicu-dev \
+            nano
         --no-install-recommends && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+# Updating ICU timezone data
+RUN mkdir -p /opt/icu/icudt52l && \
+    curl -o /opt/icu/icudt52l/metaZones.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/metaZones.res && \
+    curl -o /opt/icu/icudt52l/timezoneTypes.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/timezoneTypes.res && \
+    curl -o /opt/icu/icudt52l/windowsZones.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/windowsZones.res && \
+    curl -o /opt/icu/icudt52l/zoneinfo64.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/zoneinfo64.res
 
 
 # Install PHP extensions required for Yii 2.0 Framework
@@ -33,10 +41,16 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
                            mcrypt \
                            zip \
                            pcntl \
-                           soap
+                           soap \
+                           intl
+
+# Installing Intl dependencies
+RUN pecl install timezonedb && docker-php-ext-enable timezonedb
 
 # Add configuration files
 COPY container-files/ /
+
+
 
 ENV VERSION_COMPOSER=1.0.2 \
     VERSION_COMPOSER_ASSET_PLUGIN=^1.1.4 \
@@ -45,13 +59,16 @@ ENV VERSION_COMPOSER=1.0.2 \
     PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
     WWW_DATA_UID=1000 \
     WWW_DATA_GID=1000 \
-    TERM=linux
+    TERM=linux \
+    ICU_DATA=/opt/icu/icudt52l # Needed for correct ICU tzdata
 
 RUN mv /root/conf/php.ini /usr/local/etc/php && \
-    echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
-    echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc
+    echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ # Tweaks for running composer from www-data only
+    echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc # Tweaks for running yii console from www-data only
 
-RUN usermod -u ${WWW_DATA_UID} www-data && \
+# Changing www-data user id to default UID for debian family allows correctly 
+# edit container mounted files from host machine
+RUN usermod -u ${WWW_DATA_UID} www-data && \ 
     groupmod -g ${WWW_DATA_GID} www-data
 
 # Install composer
@@ -78,19 +95,6 @@ RUN chown -R www-data:www-data /var/www && \
 # see http://stackoverflow.com/a/8154466/291573) for usage of `printf`
 #RUN printf "\n" | pecl install xdebug-2.4.0RC2
 
-# Installing Intl dependencies
-RUN pecl install timezonedb && docker-php-ext-enable timezonedb
-
-RUN apt-get update && apt-get -y install libicu-dev && docker-php-ext-install intl
-
-# Updating ICU timezone data
-RUN mkdir -p /opt/icu/icudt52l && \
-    curl -o /opt/icu/icudt52l/metaZones.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/metaZones.res && \
-    curl -o /opt/icu/icudt52l/timezoneTypes.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/timezoneTypes.res && \
-    curl -o /opt/icu/icudt52l/windowsZones.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/windowsZones.res && \
-    curl -o /opt/icu/icudt52l/zoneinfo64.res  http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/zoneinfo64.res
-
-ENV ICU_DATA=/opt/icu/icudt52l
 
 # Setup application environment
 WORKDIR /app
