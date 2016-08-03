@@ -1,8 +1,17 @@
 FROM php:5.6-fpm
 
+# Add configuration files
+COPY container-files/ /
 
-# Working directory for initialization
-WORKDIR /root
+ENV VERSION_COMPOSER=1.0.2 \
+    VERSION_COMPOSER_ASSET_PLUGIN=^1.1.4 \
+    VERSION_PRESTISSIMO_PLUGIN=^0.1.18 \
+    VERSION_CODECEPTION=^2.1.7 \
+    PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
+    WWW_DATA_UID=1000 \
+    WWW_DATA_GID=1000 \
+    TERM=linux \
+    ICU_DATA=/opt/icu/icudt52l
 
 # Install system packages for PHP extensions
 RUN apt-get update && \
@@ -47,24 +56,9 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 # Installing Intl dependencies
 RUN pecl install timezonedb && docker-php-ext-enable timezonedb
 
-# Add configuration files
-COPY container-files/ /
-
-
-
-ENV VERSION_COMPOSER=1.0.2 \
-    VERSION_COMPOSER_ASSET_PLUGIN=^1.1.4 \
-    VERSION_PRESTISSIMO_PLUGIN=^0.1.18 \
-    VERSION_CODECEPTION=^2.1.7 \
-    PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
-    WWW_DATA_UID=1000 \
-    WWW_DATA_GID=1000 \
-    TERM=linux \
-    ICU_DATA=/opt/icu/icudt52l # Needed for correct ICU tzdata
-
 RUN mv /root/conf/php.ini /usr/local/etc/php && \
-    echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ # Tweaks for running composer from www-data only
-    echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc # Tweaks for running yii console from www-data only
+    echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
+    echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc 
 
 # Changing www-data user id to default UID for debian family allows correctly 
 # edit container mounted files from host machine
