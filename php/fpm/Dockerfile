@@ -72,11 +72,11 @@ RUN chown -R www-data:www-data /var/www && \
     curl -sS https://getcomposer.org/installer | php -- \
         --version=${VERSION_COMPOSER} && \
     mv composer.phar /usr/local/bin/composer && \
-    sudo -u www-data composer config -g github-oauth.github.com ${GITHUB_API_TOKEN} && \
-    sudo -u www-data composer global require \
-        "fxp/composer-asset-plugin:${VERSION_COMPOSER_ASSET_PLUGIN}" \
-        "hirak/prestissimo:${VERSION_PRESTISSIMO_PLUGIN}" && \
-    sudo -u www-data composer global dumpautoload --optimize
+    su - www-data -s /bin/bash -c "composer config -g github-oauth.github.com ${GITHUB_API_TOKEN}" && \
+    su - www-data -s /bin/bash -c "composer global require \
+        fxp/composer-asset-plugin:${VERSION_COMPOSER_ASSET_PLUGIN} \
+        hirak/prestissimo:${VERSION_PRESTISSIMO_PLUGIN}" && \
+    su - www-data -s /bin/bash -c "composer global dumpautoload --optimize"
 
 # Install packages required for Yii 2.0 Framework codeception testing globally
 #RUN composer global require  --prefer-dist \
