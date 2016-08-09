@@ -1,0 +1,48 @@
+FROM php:7-fpm
+ENV PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH
+COPY container-files/ /
+RUN mv /root/conf/php.ini /usr/local/etc/php && \
+    echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
+    echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc && \
+    echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y libjpeg-dev \
+                       libpng12-dev \
+                       libfreetype6-dev \
+                       libmcrypt-dev \
+                       imagemagick \
+                       libxml2-dev \
+                       libmagickwand-dev \
+                       libicu-dev \
+            --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    mkdir -p /opt/icu/icudt52l && \
+    curl -o /opt/icu/icudt52l/metaZones.res  \
+        http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/metaZones.res && \
+    curl -o /opt/icu/icudt52l/timezoneTypes.res \
+        http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/timezoneTypes.res && \
+    curl -o /opt/icu/icudt52l/windowsZones.res  \ 
+        http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/windowsZones.res && \
+    curl -o /opt/icu/icudt52l/zoneinfo64.res  \
+        http://source.icu-project.org/repos/icu/data/trunk/tzdata/icunew/2016f/44/le/zoneinfo64.res && \
+    docker-php-ext-configure gd \
+        --with-freetype-dir=/usr/include/ \
+        --with-jpeg-dir=/usr/include/ \
+        --with-png-dir=/usr/include/ && \
+    docker-php-ext-install gd && \
+    docker-php-ext-install mbstring && \
+    docker-php-ext-install -j$(nproc) iconv mcrypt && \
+    docker-php-ext-install xml && \
+    docker-php-ext-install zip && \
+    docker-php-ext-install pdo pdo_mysql && \
+    docker-php-ext-install exif && \
+    docker-php-ext-install soap && \
+    docker-php-ext-install intl && \
+    pecl install imagick-3.4.1 && \
+    echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini && \
+    echo "`head -n 3 /etc/apt/sources.list`" > /etc/apt/sources.list && \
+    pecl install timezonedb && docker-php-ext-enable timezonedb
+ARG TIMEZONE=Europe/Moscow
+RUN echo "${TIMEZONE}" > /etc/timezone && \
+    dpkg-reconfigure -f noninteractive tzdata
+
