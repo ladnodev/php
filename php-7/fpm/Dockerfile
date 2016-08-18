@@ -1,10 +1,7 @@
 FROM php:7-fpm
 ENV PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH
-COPY container-files/ /
-RUN mv /root/conf/php.ini /usr/local/etc/php && \
-    echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
+RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
     echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc && \
-    echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y libjpeg-dev \
                        libpng12-dev \
@@ -40,9 +37,8 @@ RUN mv /root/conf/php.ini /usr/local/etc/php && \
     docker-php-ext-install intl && \
     pecl install imagick-3.4.1 && \
     echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini && \
-    echo "`head -n 3 /etc/apt/sources.list`" > /etc/apt/sources.list && \
     pecl install timezonedb && docker-php-ext-enable timezonedb
-ARG TIMEZONE=Europe/Moscow
-RUN echo "${TIMEZONE}" > /etc/timezone && \
-    dpkg-reconfigure -f noninteractive tzdata
-
+COPY container-files/ /
+RUN mv /root/conf/php.ini /usr/local/etc/php 
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]
