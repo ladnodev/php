@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x #DEBUG
+#set -x #DEBUG
 set -eo pipefail
 
 DE_TIMEZONE=Europe/Moscow
