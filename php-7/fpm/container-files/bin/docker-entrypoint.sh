@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eo pipefail
-set -x #DEBUG
+#set -x #DEBUG
 
 DE_COMPOSER_VERSION=1.0.2
 DE_GITHUB_API_TOKEN=a47535b398666aed148e8740cbbf445549ee3ba1
