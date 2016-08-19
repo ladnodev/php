@@ -3,14 +3,8 @@ FROM php:5.6-fpm
 # Add configuration files
 COPY container-files/ /
 
-ENV VERSION_COMPOSER=1.0.2 \
-    VERSION_COMPOSER_ASSET_PLUGIN=^1.1.4 \
-    VERSION_PRESTISSIMO_PLUGIN=^0.1.18 \
-    VERSION_CODECEPTION=^2.1.7 \
-    PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
-    WWW_DATA_UID=1000 \
-    WWW_DATA_GID=1000 \
-    TERM=linux \
+ENV PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
+    TERM=xterm-256color \
     ICU_DATA=/opt/icu/icudt52l
 
 # Install system packages for PHP extensions
@@ -60,23 +54,6 @@ RUN mv /root/conf/php.ini /usr/local/etc/php && \
     echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
     echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc 
 
-# Changing www-data user id to default UID for debian family allows correctly 
-# edit container mounted files from host machine
-RUN usermod -u ${WWW_DATA_UID} www-data && \ 
-    groupmod -g ${WWW_DATA_GID} www-data
-
-# Install composer
-ARG GITHUB_API_TOKEN=e97e5a0d1b5433a582f6a1b2b95f9dd3cbe183aa
-
-RUN chown -R www-data:www-data /var/www && \
-    curl -sS https://getcomposer.org/installer | php -- \
-        --version=${VERSION_COMPOSER} && \
-    mv composer.phar /usr/local/bin/composer && \
-    su - www-data -s /bin/bash -c "composer config -g github-oauth.github.com ${GITHUB_API_TOKEN}" && \
-    su - www-data -s /bin/bash -c "composer global require \
-        fxp/composer-asset-plugin:${VERSION_COMPOSER_ASSET_PLUGIN} \
-        hirak/prestissimo:${VERSION_PRESTISSIMO_PLUGIN}" && \
-    su - www-data -s /bin/bash -c "composer global dumpautoload --optimize"
 
 # Install packages required for Yii 2.0 Framework codeception testing globally
 #RUN composer global require  --prefer-dist \
@@ -94,4 +71,8 @@ RUN chown -R www-data:www-data /var/www && \
 WORKDIR /app
 
 # Startup script for FPM
-CMD ["/root/run.sh"]
+#CMD ["/root/run.sh"]
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["php-fpm"]
+
