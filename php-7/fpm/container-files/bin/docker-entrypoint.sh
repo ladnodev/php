@@ -60,4 +60,3 @@ if [[ ! -f /root/first_start ]]; then
 fi
 
 exec "$@"
-
