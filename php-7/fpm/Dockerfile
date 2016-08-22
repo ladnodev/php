@@ -11,6 +11,7 @@ RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
                        libxml2-dev \
                        libmagickwand-dev \
                        libicu-dev \
+                       git \
             --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     mkdir -p /opt/icu/icudt52l && \
@@ -40,5 +41,6 @@ RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
     pecl install timezonedb && docker-php-ext-enable timezonedb
 COPY container-files/ /
 RUN mv /root/conf/php.ini /usr/local/etc/php 
+WORKDIR /app
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
