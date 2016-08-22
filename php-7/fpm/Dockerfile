@@ -38,10 +38,8 @@ RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
     docker-php-ext-install intl && \
     pecl install imagick-3.4.1 && \
     echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini && \
-    pecl install timezonedb && docker-php-ext-enable timezonedb && \
-    mkdir /app
+    pecl install timezonedb && docker-php-ext-enable timezonedb
 COPY container-files/ /
 RUN mv /root/conf/php.ini /usr/local/etc/php 
-WORKDIR /app
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
