@@ -36,6 +36,7 @@ RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
     docker-php-ext-install exif && \
     docker-php-ext-install soap && \
     docker-php-ext-install intl && \
+    docker-php-ext-install pcntl && \
     pecl install imagick-3.4.1 && \
     echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini && \
     pecl install timezonedb && docker-php-ext-enable timezonedb
