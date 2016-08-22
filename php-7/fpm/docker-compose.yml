@@ -1,8 +1,0 @@
-version: '2'
-services:
-    php:
-        build: .
-        environment:
-            - TIMEZONE=Europe/Berlin
-    php-basic:
-        image: php:7-fpm
