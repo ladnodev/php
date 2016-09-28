@@ -1,8 +1,8 @@
 FROM php:7-fpm
-ENV PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
+ENV PATH=/var/www/html:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
     TERM=xterm-256color \
-    ICU_DATA=/opt/icu/icudt52l
-    
+    ICU_DATA=/opt/icu/icudt52l 
+
 RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
     echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc && \
     apt-get update && \
@@ -43,7 +43,9 @@ RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
     pecl install imagick-3.4.1 && \
     echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini && \
     pecl install timezonedb && docker-php-ext-enable timezonedb
+
 COPY container-files/ /
+
 RUN mv /root/conf/php.ini /usr/local/etc/php 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
