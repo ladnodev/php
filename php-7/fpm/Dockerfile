@@ -1,5 +1,8 @@
 FROM php:7-fpm
-ENV PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH
+ENV PATH=/app:/app/vendor/bin:/root/.composer/vendor/bin:$PATH \
+    TERM=xterm-256color \
+    ICU_DATA=/opt/icu/icudt52l
+    
 RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \ 
     echo "alias yii='sh /root/yii.sh'" >> /root/.bashrc && \
     apt-get update && \
