@@ -6,6 +6,4 @@ RUN apt-get update && \
 
 COPY container-files/supervisord.conf /etc/supervisor/conf.d/default.conf
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-
 CMD ["/usr/bin/supervisord", "-n"]
