@@ -28,6 +28,10 @@ RUN docker-php-ext-configure gd \
     pecl install imagick-beta && \
     echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini && \
     a2enmod rewrite
+
+# Решает проблемы устаревших таймзон
+RUN pecl install timezonedb && docker-php-ext-enable timezonedb
+
 COPY container-files/ /
 RUN mv /root/conf/php.ini /usr/local/etc/php
 ENTRYPOINT ["docker-entrypoint.sh"]
