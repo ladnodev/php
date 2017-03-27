@@ -2,10 +2,8 @@
 set -eo pipefail
 #set -x #DEBUG
 
-DE_VERSION_COMPOSER=1.0.2
 DE_GITHUB_API_TOKEN=a47535b398666aed148e8740cbbf445549ee3ba1
 DE_TIMEZONE=Europe/Moscow
-DE_VERSION_COMPOSER_ASSET_PLUGIN=^1.1.4
 DE_UID=1000
 DE_GID=1000
 
@@ -50,10 +48,10 @@ if [[ ! -f /root/first_start ]]; then
 
     
     #Composer installation and configuration
-    curl -sS https://getcomposer.org/installer | php -- --version=${VERSION_COMPOSER} 
+    curl -sS https://getcomposer.org/installer | php --
     mv composer.phar /usr/local/bin/composer 
     runuser - www-data -s /bin/sh -c "/usr/local/bin/php /usr/local/bin/composer config -g github-oauth.github.com ${GITHUB_API_TOKEN}"
-    runuser - www-data -s /bin/sh -c "/usr/local/bin/php /usr/local/bin/composer global require 'fxp/composer-asset-plugin:${VERSION_COMPOSER_ASSET_PLUGIN}'"
+    runuser - www-data -s /bin/sh -c "/usr/local/bin/php /usr/local/bin/composer global require 'fxp/composer-asset-plugin'"
     runuser - www-data -s /bin/sh -c "/usr/local/bin/php /usr/local/bin/composer global dumpautoload --optimize"
     
     
