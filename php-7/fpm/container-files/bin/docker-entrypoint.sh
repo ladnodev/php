@@ -6,8 +6,6 @@ set -eo pipefail
 if [[ ! -f /root/first_start ]]; then
     touch /root/first_start
     
-    DOCKERHOST=`/sbin/ip route|awk '/default/ { print $3 }'`
-    echo "${DOCKERHOST}  dockerhost" >> /etc/hosts
 fi
 
 DE_TIMEZONE=Europe/Moscow
@@ -34,5 +32,8 @@ dpkg-reconfigure -f noninteractive tzdata
 usermod -u ${DUID} www-data 
 groupmod -g ${DGID} www-data 
 chown www-data.www-data /var/www
+
+DOCKERHOST=`/sbin/ip route|awk '/default/ { print $3 }'`
+echo "${DOCKERHOST}  dockerhost" >> /etc/hosts
 
 exec "$@"
