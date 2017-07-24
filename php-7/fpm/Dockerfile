@@ -14,6 +14,7 @@ RUN echo "alias composer='sh /root/composer.sh'" >> /root/.bashrc && \
                        libxml2-dev \
                        libmagickwand-dev \
                        libicu-dev \
+                       openssh-client \
                        git \
             --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
