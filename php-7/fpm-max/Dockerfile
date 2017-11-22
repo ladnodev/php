@@ -12,9 +12,12 @@ RUN apt-get update && \
     echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/ext-mongo.ini && \
     apt-get purge -y --auto-remove libssl-dev
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x && \
-    apt-get update && \
-    apt-get install -y nodejs build-essential npm && \
+RUN curl -sL https://deb.nodesource.com/setup_8.x -o /opt/node.sh && \
+    chmod +x /opt/node.sh && \
+    bash -c /opt/node.sh
+
+RUN apt-get update && \
+    apt-get install -y nodejs build-essential && \
     npm install npm@latest -g &&  \
     npm install -g less
 
